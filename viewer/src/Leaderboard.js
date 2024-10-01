@@ -7,7 +7,10 @@ function Leaderboard() {
 
   const fetchLeaderboard = async () => {
     try {
-      const response = await fetch("http://localhost:4000/leaderboard"); // Replace with your deployed backend URL if applicable
+      const response = await fetch(
+        process.env.REACT_APP_BACKEND_Leaderboard ||
+          "http://localhost:4000/leaderboard"
+      ); // Replace with your deployed backend URL if applicable
       const data = await response.json();
       setLeaderboard(data);
     } catch (error) {

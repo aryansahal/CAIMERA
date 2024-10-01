@@ -50,3 +50,5 @@ coverage/
 *.env.test.local
 *.env.production.local
 .env
+
+.vercel
