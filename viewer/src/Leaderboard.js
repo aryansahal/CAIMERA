@@ -8,7 +8,9 @@ function Leaderboard() {
   const fetchLeaderboard = async () => {
     try {
       const response = await fetch(
-        `${process.env.REACT_APP_BACKEND_URL}/leaderboard`
+        `${
+          process.env.REACT_APP_BACKEND_URL || "http://localhost:4000"
+        }/leaderboard`
       ); // Correctly construct the URL
       const data = await response.json();
       setLeaderboard(data);
