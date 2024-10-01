@@ -9,7 +9,7 @@ export const useSocket = () => {
   return useContext(SocketContext);
 };
 
-const SOCKET_URL = "http://localhost:4000"; // Change this to your backend URL
+const SOCKET_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:4000"; // Change this to your backend URL
 
 // Create a provider component
 export const SocketProvider = ({ children }) => {
