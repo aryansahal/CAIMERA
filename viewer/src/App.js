@@ -63,9 +63,9 @@ function App() {
     };
   }, [socket, username]);
 
-  // Helper function to validate two decimal places
+  // Helper function to validate integer answers
   const isValidAnswer = (value) => {
-    const regex = /^\d+(\.\d{1,2})?$/; // Allow up to 2 decimal places
+    const regex = /^\d+$/; // Allow only whole numbers (integers)
     return regex.test(value);
   };
 
@@ -79,14 +79,14 @@ function App() {
     }
 
     if (userAnswer !== "" && isValidAnswer(userAnswer)) {
-      const answer = parseFloat(userAnswer).toFixed(2); // Limit to 2 decimal places
+      // No need to convert to float or limit to decimal places
       socket.emit("submitAnswer", {
         username,
-        userAnswer: parseFloat(answer), // Send as float
+        userAnswer: parseInt(userAnswer, 10), // Send as integer
       });
       setUserAnswer(""); // Clear the answer input after submission
     } else {
-      alert("Please enter a valid number with up to 2 decimal places.");
+      alert("Please enter a valid whole number.");
     }
   };
 
@@ -107,7 +107,7 @@ function App() {
           />
           <input
             type="text"
-            placeholder="Your answer (up to 2 decimal places)"
+            placeholder="Your answer (whole number only)"
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
           />
