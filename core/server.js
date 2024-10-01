@@ -15,13 +15,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
-    origin: "http://localhost:3000", // Allow frontend requests from any origin
+    origin: "*", // Allow frontend requests from any origin
     methods: ["GET", "POST"],
     credentials: true,
   },
 });
 
-app.use(cors({ origin: "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: "*", credentials: true }));
 
 let currentProblem = null;
 let answer = null;
