@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from "react";
-import { useSocket } from "./SocketProvider"; // Get the socket from context
+import React, { useState, useEffect } from "react";
+import { useSocket } from "./SocketProvider";
 
 function Leaderboard() {
   const [leaderboard, setLeaderboard] = useState([]);
-  const socket = useSocket(); // Access the socket
+  const socket = useSocket();
 
   const fetchLeaderboard = async () => {
     try {
@@ -11,7 +11,7 @@ function Leaderboard() {
         `${
           process.env.REACT_APP_BACKEND_URL || "http://localhost:4000"
         }/leaderboard`
-      ); // Correctly construct the URL
+      );
       const data = await response.json();
       setLeaderboard(data);
     } catch (error) {
@@ -20,19 +20,23 @@ function Leaderboard() {
   };
 
   useEffect(() => {
-    // Fetch leaderboard initially when component mounts
     fetchLeaderboard();
 
     if (!socket) return;
 
-    // Listen for leaderboard updates from the server
     socket.on("leaderboardUpdate", () => {
       console.log("Leaderboard update received");
-      fetchLeaderboard(); // Re-fetch leaderboard when the server emits an update
+      fetchLeaderboard();
+    });
+
+    socket.on("newWinner", () => {
+      console.log("New winner found");
+      fetchLeaderboard();
     });
 
     return () => {
-      socket.off("leaderboardUpdate"); // Clean up the event listener
+      socket.off("leaderboardUpdate");
+      socket.off("newWinner");
     };
   }, [socket]);
 

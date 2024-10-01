@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useSocket, SocketProvider } from "./SocketProvider"; // Import the context
+import { useSocket, SocketProvider } from "./SocketProvider";
 import Leaderboard from "./Leaderboard";
 
 function App() {
@@ -8,14 +8,14 @@ function App() {
   const [username, setUsername] = useState("");
   const [winner, setWinner] = useState("");
   const [score, setScore] = useState(0);
-  const [isCorrect, setIsCorrect] = useState(null); // Track if the answer is correct
+  const [isCorrect, setIsCorrect] = useState(null);
+  const [newWinnerFound, setNewWinnerFound] = useState(false);
 
-  const socket = useSocket(); // Get the socket from context
+  const socket = useSocket();
 
   useEffect(() => {
-    if (!socket) return; // Ensure socket is initialized
+    if (!socket) return;
 
-    // Receive new problem from server
     socket.on("connect", () => {
       console.log("Connected to the server");
     });
@@ -29,23 +29,22 @@ function App() {
       setProblem(problem);
       setWinner("");
       setUserAnswer("");
-      setIsCorrect(null); // Reset correct/incorrect status on new problem
+      setIsCorrect(null);
+      setNewWinnerFound(false);
     });
 
-    // Handle when a user wins
     socket.on("winner", ({ username }) => {
       setWinner(`${username} is the winner!`);
-      setIsCorrect(true); // Correct answer for the winner
+      setIsCorrect(true);
+      setNewWinnerFound(true);
     });
 
-    // Handle when a user submits an incorrect answer
     socket.on("incorrectAnswer", ({ username: incorrectUsername }) => {
       if (incorrectUsername === username) {
-        setIsCorrect(false); // Incorrect answer for the current user
+        setIsCorrect(false);
       }
     });
 
-    // Update user score
     socket.on(
       "scoreUpdate",
       ({ username: updatedUsername, score: updatedScore }) => {
@@ -63,15 +62,17 @@ function App() {
     };
   }, [socket, username]);
 
-  // Helper function to validate integer answers
   const isValidAnswer = (value) => {
-    const regex = /^\d+$/; // Allow only whole numbers (integers)
+    const regex = /^\d+$/;
     return regex.test(value);
   };
 
-  // Handle answer submission
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    if (newWinnerFound) {
+      return;
+    }
 
     if (username.trim() === "") {
       alert("Please enter a username before submitting an answer.");
@@ -79,12 +80,11 @@ function App() {
     }
 
     if (userAnswer !== "" && isValidAnswer(userAnswer)) {
-      // No need to convert to float or limit to decimal places
       socket.emit("submitAnswer", {
         username,
-        userAnswer: parseInt(userAnswer, 10), // Send as integer
+        userAnswer: parseInt(userAnswer, 10),
       });
-      setUserAnswer(""); // Clear the answer input after submission
+      setUserAnswer("");
     } else {
       alert("Please enter a valid whole number.");
     }
@@ -107,16 +107,18 @@ function App() {
           />
           <input
             type="text"
-            placeholder="Your answer (whole number only)"
+            placeholder="Your answer"
             value={userAnswer}
             onChange={(e) => setUserAnswer(e.target.value)}
+            disabled={newWinnerFound}
           />
-          <button type="submit">Submit Answer</button>
+          <button type="submit" disabled={newWinnerFound}>
+            Submit Answer
+          </button>
         </form>
 
-        {/* Show incorrect answer feedback */}
         {isCorrect === false && (
-          <p style={{ color: "red" }}>Incorrect answer, try again!</p>
+          <p className="error-message">Incorrect answer, try again!</p>
         )}
 
         <h3>Your Score: {score}</h3>
@@ -126,7 +128,6 @@ function App() {
   );
 }
 
-// Wrap the entire app in the SocketProvider
 const AppWrapper = () => {
   return (
     <SocketProvider>
