@@ -27,15 +27,13 @@ let currentProblem = null;
 let answer = null;
 let problemLocked = false;
 
-// Function to generate a new random math problem
+// Function to generate a new random addition problem
 const generateProblem = () => {
-  const operations = ["+", "-", "*", "/"];
-  const num1 = Math.floor(Math.random() * 100);
-  const num2 = Math.floor(Math.random() * 100);
-  const randomOp = operations[Math.floor(Math.random() * operations.length)];
+  const num1 = Math.floor(Math.random() * 100); // Random number between 0-99
+  const num2 = Math.floor(Math.random() * 100); // Random number between 0-99
 
-  currentProblem = `${num1} ${randomOp} ${num2}`;
-  answer = eval(currentProblem).toFixed(2);
+  currentProblem = `${num1} + ${num2}`; // Only addition
+  answer = (num1 + num2).toString(); // Calculate the answer as a string
   console.log(`Generated Problem: ${currentProblem}, Answer: ${answer}`);
   return currentProblem;
 };
